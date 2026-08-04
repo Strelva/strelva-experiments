@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "id": "buffalo-action-case",
+  "name": "Buffalo action case",
+  "version": "0.1.0",
+  "status": "public-preview",
+  "description": "A human-executable method for organizing a Buffalo or Erie County notice, deadline, hearing, records denial, or appeal without making a legal determination.",
+  "jurisdiction": ["City of Buffalo", "Erie County", "New York State", "United States"],
+  "audience": ["residents", "tenants", "small property owners", "community advocates"],
+  "artifacts": ["README.md", "SKILL.md", "sources.json"],
+  "sourceMetadata": {
+    "reviewedAt": "2026-08-04",
+    "reviewMethod": "Manual check of each official procedure page, form, and contact landing page.",
+    "reviewScope": "Page-level procedure and contact review, not case-specific legal validation.",
+    "sourcePolicy": "Use the notice and issuing agency first. Use State and federal guidance for process context, not as a substitute for the notice."
+  },
+  "updateMetadata": {
+    "cadence": "quarterly",
+    "beforeUse": "Recheck the issuing agency's current procedure and every date printed on the notice before taking action.",
+    "triggers": ["form change", "contact change", "deadline language change", "new hearing or appeal route", "jurisdiction change"],
+    "procedure": "Update sources.json and this manifest's reviewedAt, then test the case worksheet against a current public notice or form."
+  },
+  "limits": [
+    "No forms are submitted and no agency contact is made by this pack.",
+    "The pack does not calculate deadlines, determine validity, select a defense, or provide legal advice.",
+    "A general webpage cannot override a case-specific notice or order.",
+    "Users should contact the issuing agency and a qualified professional when needed."
+  ],
+  "license": "MIT"
+}
+

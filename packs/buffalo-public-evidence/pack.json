@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "id": "buffalo-public-evidence",
+  "name": "Buffalo public evidence",
+  "version": "0.1.0",
+  "status": "public-preview",
+  "description": "A human-executable source packet for tracing Buffalo and Erie County public decisions from notice and agenda to minutes, recordings, records, and supporting data.",
+  "jurisdiction": ["City of Buffalo", "Erie County", "New York State", "United States"],
+  "audience": ["residents", "reporters", "public-interest researchers", "neighborhood groups", "small organizations"],
+  "artifacts": ["README.md", "SKILL.md", "sources.json"],
+  "sourceMetadata": {
+    "reviewedAt": "2026-08-04",
+    "reviewMethod": "Manual check of each official landing page and source purpose.",
+    "reviewScope": "URL reachability and publisher identity, not an audit of every meeting or record.",
+    "sourcePolicy": "Prefer first-party meeting, records, open-data, and public-law sources. Preserve the source's date, status, and limitations."
+  },
+  "updateMetadata": {
+    "cadence": "quarterly",
+    "beforeUse": "Recheck the current meeting page, record status, or FOIL instructions before publishing or relying on them.",
+    "triggers": ["agenda system change", "dataset definition change", "FOIL process change", "new redaction or access notice"],
+    "procedure": "Update sources.json and this manifest's reviewedAt, then test the claim-to-source ledger on one recent item."
+  },
+  "limits": [
+    "No monitoring, alerts, scraping, transcription, or integrations are included.",
+    "The pack does not establish motive, wrongdoing, causation, or legal liability.",
+    "Minutes and open-data records may be incomplete, delayed, corrected, or redacted.",
+    "The pack is not legal, investigative, or journalistic advice."
+  ],
+  "license": "MIT"
+}
+

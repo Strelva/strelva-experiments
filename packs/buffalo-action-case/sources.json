@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0",
+  "packId": "buffalo-action-case",
+  "reviewedAt": "2026-08-04",
+  "sources": [
+    {
+      "id": "buffalo-hearing-information",
+      "title": "Bureau of Administrative Adjudication - Hearing Information",
+      "publisher": "City of Buffalo Bureau of Administrative Adjudication",
+      "level": "city",
+      "url": "https://www.buffalony.gov/416/Hearing-Information",
+      "purpose": "City hearing, default, payment, and appeal information for administrative-adjudication matters.",
+      "useFor": ["identifying the City's hearing route", "checking what the agency says about a missed hearing or appeal", "finding the current office phone"],
+      "capture": ["case or summons number", "hearing request method", "scheduled hearing date", "payment or appeal language", "office contact", "page access date"],
+      "limits": ["The page is general information. The specific notice controls the case and may contain different dates or instructions."]
+    },
+    {
+      "id": "buffalo-zoning-administrative-appeal",
+      "title": "Administrative Appeal Form",
+      "publisher": "City of Buffalo Zoning Board of Appeals / Office of Strategic Planning",
+      "level": "city",
+      "url": "https://www.buffalony.gov/DocumentCenter/View/15120/496-11312---Administrative-Appeal-Form-",
+      "purpose": "Current City form and process notes for an administrative zoning appeal.",
+      "useFor": ["checking the City's stated filing materials and routing", "capturing the hearing and notice sequence", "building a submission checklist"],
+      "capture": ["form revision date", "appeal basis as stated on the form", "submission address or email", "fee shown", "notice-of-complete-application step", "hearing and decision language"],
+      "limits": ["The form's steps and fees can change. It does not determine whether a particular appeal is timely or meritorious."]
+    },
+    {
+      "id": "buffalo-permits-inspections",
+      "title": "Permits & Inspections Data Resources",
+      "publisher": "City of Buffalo Department of Permit and Inspection Services",
+      "level": "city",
+      "url": "https://www.buffalony.gov/1376/Public-Data",
+      "purpose": "Official index of City permit, inspection, violation, summons, and zoning data resources.",
+      "useFor": ["finding the right public dataset for a notice", "checking case or permit identifiers", "routing questions to Permit and Inspection Services"],
+      "capture": ["dataset name and URL", "case or permit ID", "record date", "status", "contact or office", "dataset update date"],
+      "limits": ["Dataset records can be incomplete or delayed. Use the notice and agency case file for the controlling facts."]
+    },
+    {
+      "id": "buffalo-foil",
+      "title": "FOIL Requests",
+      "publisher": "City of Buffalo",
+      "level": "city",
+      "url": "https://buffalony.nextrequest.com/",
+      "purpose": "City public-record request route when a case record or supporting document is not posted.",
+      "useFor": ["requesting a copy of a record", "logging the request and response", "finding any posted release"],
+      "capture": ["request number", "specific record description", "submission date", "acknowledgment or denial", "appeal contact if shown"],
+      "limits": ["FOIL requests can take time and can be denied or redacted. A request does not pause a notice deadline unless the agency says so."]
+    },
+    {
+      "id": "erie-foil-request",
+      "title": "Freedom of Information Law Request Form",
+      "publisher": "Erie County",
+      "level": "county",
+      "url": "https://www4.erie.gov/form/freedom-information-law-request-form",
+      "purpose": "County department FOIL request form and routing notes.",
+      "useFor": ["requesting a county record", "recording department selection and request wording", "checking the county's acknowledgment process"],
+      "capture": ["department", "records description", "date sent", "preferred format", "acknowledgment or response"],
+      "limits": ["Independent county offices use separate processes. A FOIL request does not automatically extend another case deadline."]
+    },
+    {
+      "id": "erie-clerk-foil-appeal",
+      "title": "How to Appeal a FOIL Decision",
+      "publisher": "Erie County Clerk",
+      "level": "county",
+      "url": "https://www4.erie.gov/clerk/how-appeal-foil-decision",
+      "purpose": "County Clerk-specific FOIL denial appeal instructions and form link.",
+      "useFor": ["checking the appeal recipient and stated timing", "building an appeal packet with the original request and denial", "logging the appeal"],
+      "capture": ["denial date", "records withheld", "appeal officer", "appeal submission date", "response or final determination"],
+      "limits": ["This page covers the County Clerk's office, not every Erie County department. Verify the controlling notice and current page."]
+    },
+    {
+      "id": "erie-dss-fair-hearings",
+      "title": "Fair Hearings",
+      "publisher": "Erie County Department of Social Services and New York State Office of Temporary and Disability Assistance",
+      "level": "county-state",
+      "url": "https://www3.erie.gov/socialservices/fair-hearings",
+      "purpose": "Fair-hearing information for a County Social Services decision and the notice's aid-continuing instructions.",
+      "useFor": ["identifying the hearing channel named by a benefits notice", "recording the request method and postmark or fax proof", "checking the agency contact"],
+      "capture": ["notice type", "case number", "date on notice", "request method", "postmark or fax confirmation", "hearing date"],
+      "limits": ["The notice controls the case. The page warns that preserving aid-continuing rights depends on the instructions and timing described in the Notice of Intent."]
+    },
+    {
+      "id": "nys-open-government-foil",
+      "title": "Make a FOIL Request",
+      "publisher": "New York State Committee on Open Government",
+      "level": "state",
+      "url": "https://opengovernment.ny.gov/make-foil-request",
+      "purpose": "State FOIL process, request specificity, response, and appeal guidance.",
+      "useFor": ["checking the general State FOIL sequence", "drafting a specific records description", "finding the stated appeal window"],
+      "capture": ["request date", "agency records officer", "acknowledgment or denial", "appeal date and recipient", "source update date"],
+      "limits": ["This is general guidance, not case-specific legal advice. Agency procedures and exemptions still apply."]
+    },
+    {
+      "id": "nys-tax-assessment-appeal",
+      "title": "Challenge Your Assessment",
+      "publisher": "New York State Department of Taxation and Finance",
+      "level": "state",
+      "url": "https://www.tax.ny.gov/pit/property/contest/contestasmt.htm",
+      "purpose": "State-level explanation and routing for challenging a local property assessment.",
+      "useFor": ["identifying the local assessor or grievance route named by the State", "building a question list from an assessment notice", "capturing the applicable local filing instructions"],
+      "capture": ["assessment year", "municipality", "grievance or filing route", "date on notice", "form or contact link"],
+      "limits": ["Assessment appeals are local and time-sensitive. This page does not calculate the user's deadline or decide the merits."]
+    },
+    {
+      "id": "federal-foia",
+      "title": "FOIA.gov",
+      "publisher": "United States Government",
+      "level": "federal",
+      "url": "https://www.foia.gov/",
+      "purpose": "Federal records-request, response, and appeal routing.",
+      "useFor": ["identifying a federal agency records office", "checking request and appeal instructions", "logging tracking numbers and response dates"],
+      "capture": ["agency", "request description", "tracking number", "response or denial date", "appeal instructions"],
+      "limits": ["Federal agency rules, exemptions, fees, and deadlines vary. A FOIA request does not suspend another notice or order."]
+    },
+    {
+      "id": "hud-fair-housing-complaint",
+      "title": "File a Fair Housing Complaint",
+      "publisher": "U.S. Department of Housing and Urban Development",
+      "level": "federal",
+      "url": "https://www.hud.gov/contactus/file-complaint",
+      "purpose": "Federal route for housing-discrimination complaint information and contact options.",
+      "useFor": ["checking whether HUD's complaint channel is relevant", "capturing the agency contact and submitted materials", "preserving the notice and communication timeline"],
+      "capture": ["housing issue and date", "property or respondent", "agency contact", "submission confirmation", "next communication"],
+      "limits": ["HUD's process and any time limits can change. The page is not a legal determination and does not replace a notice, court filing, or advice from a qualified professional."]
+    }
+  ]
+}

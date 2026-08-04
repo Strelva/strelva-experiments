@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0",
+  "packId": "buffalo-public-evidence",
+  "reviewedAt": "2026-08-04",
+  "sources": [
+    {
+      "id": "buffalo-agenda-center",
+      "title": "Agenda Center",
+      "publisher": "City of Buffalo",
+      "level": "city",
+      "url": "https://www.buffalony.gov/AgendaCenter",
+      "purpose": "Searchable agendas, minutes, and downloads for City boards, commissions, and Council meetings.",
+      "useFor": ["finding meeting notices and agenda packets", "checking whether minutes are draft or posted", "capturing meeting date and body"],
+      "capture": ["body", "meeting date and time", "agenda item title or number", "agenda/minutes status", "PDF or download URL"],
+      "limits": ["The page says older material may be in the Document Center. Draft minutes may change before approval."]
+    },
+    {
+      "id": "buffalo-common-council",
+      "title": "The Buffalo Common Council",
+      "publisher": "City of Buffalo Common Council",
+      "level": "city",
+      "url": "https://www.buffalony.gov/362/Common-Council",
+      "purpose": "Official Council context, district information, and links to live or recorded meeting access.",
+      "useFor": ["confirming the legislative body and district", "finding Council meeting video links", "routing a question to the Council"],
+      "capture": ["meeting or body name", "district or member context", "recording link", "access date"],
+      "limits": ["A livestream or social-media recording is contextual evidence. Use the official agenda and minutes for the formal item and vote."]
+    },
+    {
+      "id": "buffalo-open-data",
+      "title": "Open Data Buffalo",
+      "publisher": "City of Buffalo",
+      "level": "city",
+      "url": "https://data.buffalony.gov/",
+      "purpose": "City datasets that can support a public decision or outcome claim, such as permits, violations, property sales, and service records.",
+      "useFor": ["finding a dataset by topic", "recording dataset definition and update date", "linking a claim to a row or query"],
+      "capture": ["dataset title and ID", "field names", "row identifier", "last-updated date", "query or download URL"],
+      "limits": ["Dataset pages carry their own disclaimers and may not be the City's complete official record. Do not infer causation or intent from correlation."]
+    },
+    {
+      "id": "buffalo-foil",
+      "title": "FOIL Requests",
+      "publisher": "City of Buffalo",
+      "level": "city",
+      "url": "https://buffalony.nextrequest.com/",
+      "purpose": "City portal for requesting records that are not already publicly posted.",
+      "useFor": ["checking whether a request or released record exists", "submitting a narrowly described City record request", "logging request and response dates"],
+      "capture": ["request number", "records description", "submission date", "acknowledgment or response", "released or withheld items"],
+      "limits": ["FOIL access is subject to statutory exemptions, redactions, fees, and agency custody. The portal does not prove that an unposted record does not exist."]
+    },
+    {
+      "id": "erie-legislature-agendas",
+      "title": "Session Agendas & Minutes",
+      "publisher": "Erie County Legislature",
+      "level": "county",
+      "url": "https://www4.erie.gov/legislature/session-agendas-minutes",
+      "purpose": "County legislative agendas, minutes, public-hearing notices, live links, and prior-session archives.",
+      "useFor": ["tracking a local law or resolution", "comparing introduced, amended, and adopted items", "saving the county's item number and packet"],
+      "capture": ["session number and date", "item number and title", "agenda or minutes URL", "vote or disposition as shown", "public-hearing notice if relevant"],
+      "limits": ["Use the County's stated status and date. A listed agenda item may be postponed, amended, or not adopted."]
+    },
+    {
+      "id": "erie-legislature-foil",
+      "title": "Public Information/FOIL",
+      "publisher": "Erie County Legislature",
+      "level": "county",
+      "url": "https://www4.erie.gov/legislature/legislature/public-informationfoil",
+      "purpose": "County Legislature FOIL officer, appeal contact, and records-access routing.",
+      "useFor": ["routing a Legislature record request", "capturing the responsible officer and appeal path", "logging correspondence"],
+      "capture": ["records description", "request date", "FOIL officer", "response or denial date", "appeal officer if needed"],
+      "limits": ["This page covers the Legislature. Other county offices have separate records officers and processes."]
+    },
+    {
+      "id": "erie-clerk-records",
+      "title": "Official Records Public Search",
+      "publisher": "Erie County Clerk",
+      "level": "county",
+      "url": "https://ecclerk.erie.gov/BrowserView/default",
+      "purpose": "Public search for recorded instruments that may substantiate a property, contracting, or ownership claim.",
+      "useFor": ["checking the recording trail", "capturing instrument number, book/page, party, and date"],
+      "capture": ["query type", "party or parcel ID", "document type", "instrument number", "recording date"],
+      "limits": ["The Clerk says the index is not searchable by property address. A record search is not a legal opinion or complete investigation."]
+    },
+    {
+      "id": "nys-open-government",
+      "title": "Open Government",
+      "publisher": "New York State Committee on Open Government",
+      "level": "state",
+      "url": "https://opengovernment.ny.gov/",
+      "purpose": "Official guidance, law text, sample letters, and advisory materials for FOIL and the Open Meetings Law.",
+      "useFor": ["understanding the source's access vocabulary", "finding current sample FOIL or appeal language", "checking OML and FOIL guidance"],
+      "capture": ["specific page or law section", "publication date or update date", "guidance quoted or relied on"],
+      "limits": ["Guidance is not a case-specific legal opinion. A particular agency may have its own officer, portal, schedule, or exemption."]
+    },
+    {
+      "id": "nys-open-data",
+      "title": "Open NY",
+      "publisher": "New York State",
+      "level": "state",
+      "url": "https://data.ny.gov/",
+      "purpose": "State public datasets for context, funding, health, environment, transportation, and other public decisions.",
+      "useFor": ["finding a State dataset", "capturing its owner, definition, date, and row identifier", "cross-checking a local claim with State data"],
+      "capture": ["dataset title and ID", "publisher or agency", "field definition", "last-updated date", "query or download URL"],
+      "limits": ["Each dataset has its own coverage and quality notes. A State dataset may not be the official record for a local action."]
+    },
+    {
+      "id": "federal-register",
+      "title": "Federal Register",
+      "publisher": "Office of the Federal Register, National Archives",
+      "level": "federal",
+      "url": "https://www.federalregister.gov/",
+      "purpose": "Official federal notices, proposed rules, final rules, meetings, and public-comment opportunities.",
+      "useFor": ["checking whether a federal notice exists", "capturing document number, agency, publication date, and comment deadline"],
+      "capture": ["document number", "agency", "document title", "publication date", "comment or effective date", "permalink"],
+      "limits": ["A Federal Register notice may announce a process rather than a final decision. Follow the notice's own instructions and dates."]
+    },
+    {
+      "id": "federal-foia",
+      "title": "FOIA.gov",
+      "publisher": "United States Government",
+      "level": "federal",
+      "url": "https://www.foia.gov/",
+      "purpose": "Federal records-request guidance, agency links, and FOIA process information.",
+      "useFor": ["finding the federal agency that holds a record", "submitting or tracking a federal FOIA request", "recording a response or appeal path"],
+      "capture": ["agency", "records description", "request date or tracking number", "response status", "appeal instructions"],
+      "limits": ["FOIA has exemptions, agency-specific procedures, fees, and delays. It does not create a record that an agency does not maintain."]
+    }
+  ]
+}
+

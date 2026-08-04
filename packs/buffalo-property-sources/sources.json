@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0",
+  "packId": "buffalo-property-sources",
+  "reviewedAt": "2026-08-04",
+  "sources": [
+    {
+      "id": "buffalo-property-resources",
+      "title": "City Property Resources",
+      "publisher": "City of Buffalo",
+      "level": "city",
+      "url": "https://www.buffalony.gov/588/City-Property-Resources",
+      "purpose": "Landing page for the City's property card, GIS maps, in-rem property listing, permits and inspections, real estate, and rental-registration resources.",
+      "useFor": ["finding the correct City property lookup", "finding City-owned or in-rem resources", "confirming the responsible City office"],
+      "capture": ["linked tool name", "property identifier returned by the tool", "observed date"],
+      "limits": ["The landing page links to separate systems with separate coverage and update schedules."]
+    },
+    {
+      "id": "buffalo-property-card",
+      "title": "Online Property Record Card",
+      "publisher": "City of Buffalo Department of Assessment and Taxation",
+      "level": "city",
+      "url": "https://property.spatialest.com/ny/buffalo/",
+      "purpose": "City property-card lookup for address and assessment-related fields.",
+      "useFor": ["matching an address to a City parcel record", "capturing the City's property identifier and displayed assessment fields"],
+      "capture": ["address as displayed", "parcel or print key", "property class", "assessment fields", "record date if shown"],
+      "limits": ["Displayed values and coverage can change; do not treat an assessment as a current market value or title record."]
+    },
+    {
+      "id": "buffalo-permits",
+      "title": "Permits",
+      "publisher": "City of Buffalo Open Data, Department of Permit and Inspection Services",
+      "level": "city",
+      "url": "https://data.buffalony.gov/Economic-Neighborhood-Development/Permits/9p2d-f3yt",
+      "purpose": "Issued permit records for City properties, including permit type, address, issued date, and project fields.",
+      "useFor": ["checking whether a recent permit record is visible", "building a dated project history"],
+      "capture": ["permit number", "permit type", "address", "issued date", "status or closeout fields if present", "dataset last-updated date"],
+      "limits": ["The dataset describes issued records and can lag or be corrected. A missing row does not prove that work was unpermitted."]
+    },
+    {
+      "id": "buffalo-code-violations",
+      "title": "Code Violations",
+      "publisher": "City of Buffalo Open Data, Department of Permit and Inspection Services",
+      "level": "city",
+      "url": "https://data.buffalony.gov/Quality-of-Life/Code-Violations/ivrf-k9vm",
+      "purpose": "Public code-violation records issued after an inspection verified a condition covered by building, fire, or City code.",
+      "useFor": ["checking for recorded violation cases", "comparing violation dates, status, and code sections"],
+      "capture": ["case number", "address", "violation date", "code section", "status", "dataset last-updated date"],
+      "limits": ["The City says the absence of a record does not mean inspectors are not working with an owner. Do not infer current safety or compliance from one row."]
+    },
+    {
+      "id": "buffalo-rental-registry",
+      "title": "Rental Registry",
+      "publisher": "City of Buffalo Open Data, Department of Permit and Inspection Services",
+      "level": "city",
+      "url": "https://data.buffalony.gov/Quality-of-Life/Rental-Registry/hpqg-ihzt",
+      "purpose": "Registration records for covered non-owner-occupied rental dwellings in Buffalo.",
+      "useFor": ["checking whether a covered rental registration is visible", "comparing registration status and expiration fields"],
+      "capture": ["address", "license number", "license status", "status date", "expiration date", "parcel identifier if present", "dataset last-updated date"],
+      "limits": ["Coverage follows the City's rental-registration rules. Registration is not proof of occupancy, habitability, or current compliance."]
+    },
+    {
+      "id": "erie-property-search",
+      "title": "Search for a Property",
+      "publisher": "Erie County Real Property Tax Services",
+      "level": "county",
+      "url": "https://www3.erie.gov/ecrpts/featured/search-property",
+      "purpose": "County parcel search for commonly referenced real-property fields.",
+      "useFor": ["finding the SBL or parcel identifier", "capturing owner or mailing fields as displayed", "checking assessment and tax-roll context"],
+      "capture": ["address", "SBL or parcel ID", "owner and mailing fields", "property class", "assessment and tax fields", "record or roll year"],
+      "limits": ["The County describes this as a subset of the NYS Real Property System. Confirm legal ownership and recorded instruments with the County Clerk."]
+    },
+    {
+      "id": "erie-on-map",
+      "title": "Erie County On-Map",
+      "publisher": "Erie County Office of GIS",
+      "level": "county",
+      "url": "https://www3.erie.gov/gis/internet-mapping",
+      "purpose": "Interactive parcel map with aerial imagery and contextual layers such as floodplains, wetlands, streets, and school districts.",
+      "useFor": ["visual parcel context", "checking map layers near a property", "cross-checking a parcel location"],
+      "capture": ["map URL or screenshot", "layer names", "parcel ID", "map date or metadata date if shown"],
+      "limits": ["County mapping warns that maps can be generalized and are not surveys or substitutes for legal parcel boundaries. Update frequency is not guaranteed."]
+    },
+    {
+      "id": "erie-clerk-records",
+      "title": "Official Records Public Search",
+      "publisher": "Erie County Clerk",
+      "level": "county",
+      "url": "https://ecclerk.erie.gov/BrowserView/default",
+      "purpose": "Search for recorded deeds, mortgages, liens, judgments, and related instruments by party, document, map, or parcel ID.",
+      "useFor": ["locating a recorded instrument after finding a parcel ID", "capturing instrument number and recording date"],
+      "capture": ["party or parcel query", "document type", "instrument number", "book/page if shown", "recording date"],
+      "limits": ["The Clerk says address search is not available in the official-records index. A search result is not a legal title opinion."]
+    },
+    {
+      "id": "nys-dec-environmental-sites",
+      "title": "Environmental Site Database Search",
+      "publisher": "New York State Department of Environmental Conservation",
+      "level": "state",
+      "url": "https://extapps.dec.ny.gov/cfmx/extapps/derexternal/index.cfm?pageid=3",
+      "purpose": "Searchable State information about regulated or remediated environmental sites.",
+      "useFor": ["checking whether a property or nearby location appears in a State environmental site system", "opening the site's official record"],
+      "capture": ["site name or ID", "program", "address or location", "status", "record date"],
+      "limits": ["Search coverage and status are program-specific. Absence from this database does not prove no contamination or environmental concern."]
+    },
+    {
+      "id": "fema-flood-map-service-center",
+      "title": "Flood Map Service Center",
+      "publisher": "Federal Emergency Management Agency",
+      "level": "federal",
+      "url": "https://msc.fema.gov/portal/home",
+      "purpose": "Official flood-map lookup for a property or area.",
+      "useFor": ["checking the current map panel and flood-zone context", "saving the map panel, effective date, and disclaimer"],
+      "capture": ["search address", "map panel number", "effective date", "zone shown", "map URL or download name"],
+      "limits": ["A map lookup is not an insurance quote, engineering determination, or guarantee of future flooding. Follow FEMA's map and appeal instructions for map changes."]
+    },
+    {
+      "id": "epa-envirofacts",
+      "title": "Envirofacts",
+      "publisher": "U.S. Environmental Protection Agency",
+      "level": "federal",
+      "url": "https://enviro.epa.gov/",
+      "purpose": "Federal environmental-data search by location, facility, or program.",
+      "useFor": ["checking nearby regulated facilities or environmental records", "linking to the underlying EPA program record"],
+      "capture": ["search terms or coordinates", "facility or program ID", "record date", "underlying source link"],
+      "limits": ["Environmental data is program-specific and may not describe a parcel's building condition or current risk. Verify with the underlying program and agency."]
+    }
+  ]
+}
+

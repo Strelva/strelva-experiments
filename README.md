@@ -1,4 +1,8 @@
-# Buffalo Business Navigator
+# Strelva Experiments
+
+Public experiments and reusable research packs from Strelva Labs.
+
+## Buffalo Business Navigator
 
 A small Strelva Labs chat experiment that connects an ordinary business description to useful Buffalo, Erie County, and New York State resources.
 
@@ -30,6 +34,12 @@ browser, and do not deploy this endpoint as an untrusted public execution host.
 npm test
 npm run build
 ```
+
+## Packs
+
+The [`packs`](./packs/) shelf contains small, versioned source catalogs and
+human-executable methods for Buffalo property research, public evidence, and
+notice-to-resolution casework. Packs do not require the app or an API key.
 
 ## Add or update a source
 

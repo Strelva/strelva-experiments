@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "id": "buffalo-property-sources",
+  "name": "Buffalo property sources",
+  "version": "0.1.0",
+  "status": "public-preview",
+  "description": "A human-executable source packet for parcel, vacancy-signal, permit, violation, rental-registration, and context research in Buffalo and Erie County.",
+  "jurisdiction": ["City of Buffalo", "Erie County", "New York State", "United States"],
+  "audience": ["residents", "tenants", "property owners", "block clubs", "reporters", "community researchers"],
+  "artifacts": ["README.md", "SKILL.md", "sources.json"],
+  "sourceMetadata": {
+    "reviewedAt": "2026-08-04",
+    "reviewMethod": "Manual check of each official landing page and source purpose.",
+    "reviewScope": "URL reachability and publisher identity, not an audit of every record.",
+    "sourcePolicy": "Prefer first-party City, County, State, and federal pages. Keep the source's own caveats with every observation."
+  },
+  "updateMetadata": {
+    "cadence": "quarterly",
+    "beforeUse": "Recheck any source used for a current status, deadline, ownership, compliance, or environmental conclusion.",
+    "triggers": ["URL change", "dataset definition change", "new agency disclaimer", "method or jurisdiction change"],
+    "procedure": "Update sources.json and this manifest's reviewedAt, then test the workflow on one address."
+  },
+  "limits": [
+    "No automation, monitoring, scraping, or integration is included.",
+    "A public record is not a complete statement of current physical conditions.",
+    "The pack does not determine vacancy, ownership, title, code compliance, eligibility, or legal rights.",
+    "The pack is not legal, tax, housing, engineering, or environmental advice."
+  ],
+  "license": "MIT"
+}
+
