@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "id": "buffalo-property-sources",
-  "name": "Buffalo property sources",
+  "id": "research-buffalo-property",
+  "name": "Research a Buffalo property",
   "version": "0.1.0",
   "status": "public-preview",
   "description": "A human-executable source packet for parcel, vacancy-signal, permit, violation, rental-registration, and context research in Buffalo and Erie County.",
@@ -28,4 +28,3 @@
   ],
   "license": "MIT"
 }
-

@@ -1,9 +1,9 @@
 ---
-name: buffalo-public-evidence
-description: Trace a Buffalo or Erie County public claim from the official notice or agenda to minutes, recordings, records, and supporting data.
+name: follow-buffalo-public-decision
+description: Follow a Buffalo or Erie County public decision from its official notice or agenda through minutes, recordings, records, and supporting data.
 ---
 
-# Buffalo public evidence method
+# Follow a Buffalo public decision
 
 ## Input
 
@@ -75,4 +75,3 @@ Return:
 - If a source includes personal data, minimize or redact it in your output.
 - If the question asks "was this illegal?" or "who is at fault?", report the
   public record and refer the legal question to a qualified professional.
-

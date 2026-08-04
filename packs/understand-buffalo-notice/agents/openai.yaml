@@ -1,0 +1,4 @@
+interface:
+  display_name: "Understand a Buffalo Notice"
+  short_description: "Turn a Buffalo notice into clear next steps"
+  default_prompt: "Use $understand-buffalo-notice to organize this Buffalo notice into facts, dates, and next contacts."

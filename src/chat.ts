@@ -1,5 +1,5 @@
 import type { OpportunityMatch } from "./catalog.ts";
-import { MAX_THREAD_MESSAGES } from "../skills/buffalo-business-navigator/config.ts";
+import { MAX_THREAD_MESSAGES } from "../skills/find-buffalo-business-help/config.ts";
 
 export const MAX_PROMPTS = MAX_THREAD_MESSAGES;
 

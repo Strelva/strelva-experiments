@@ -1,9 +1,9 @@
 ---
-name: buffalo-action-case
-description: Turn a Buffalo-area notice or agency communication into a dated fact timeline and verified next-contact checklist without calculating legal rights or deadlines.
+name: understand-buffalo-notice
+description: Understand a Buffalo-area notice or agency communication by turning it into a dated fact timeline and verified next-contact checklist without calculating legal rights or deadlines.
 ---
 
-# Buffalo action case method
+# Understand a Buffalo notice
 
 ## Safety rule
 

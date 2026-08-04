@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "packId": "buffalo-public-evidence",
+  "packId": "follow-buffalo-public-decision",
   "reviewedAt": "2026-08-04",
   "sources": [
     {
@@ -126,4 +126,3 @@
     }
   ]
 }
-

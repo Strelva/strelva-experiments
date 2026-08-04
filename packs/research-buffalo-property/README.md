@@ -1,4 +1,4 @@
-# Buffalo property sources
+# Research a Buffalo property
 
 ## Who this helps
 
@@ -35,4 +35,3 @@ claim. Re-run the workflow on one known address, note changed field names or
 definitions, and update `sources.json`, `pack.json` `reviewedAt`, and this file
 when the method or limits change. Preserve the previous observation date in
 your research log instead of overwriting it.
-

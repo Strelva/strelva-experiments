@@ -1,1 +1,1 @@
-export * from "../skills/buffalo-business-navigator/catalog.ts";
+export * from "../skills/find-buffalo-business-help/catalog.ts";

@@ -1,4 +1,4 @@
-# Buffalo action case
+# Understand a Buffalo notice
 
 ## Who this helps
 
@@ -33,4 +33,3 @@ recent City hearing page, one FOIL appeal page, and one State or federal appeal
 page. Update `sources.json`, `pack.json` `reviewedAt`, and this README whenever
 an agency changes its form, contact, deadline language, or scope. Keep dated
 copies of notices and old procedures in the case file.
-

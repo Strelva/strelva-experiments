@@ -1,4 +1,4 @@
-# Buffalo public evidence
+# Follow a Buffalo public decision
 
 ## Who this helps
 
@@ -33,4 +33,3 @@ procedure, or dataset definition. Recheck one recent agenda and one older item
 to catch archive changes. Update `sources.json` and `pack.json` `reviewedAt` when
 publisher, URL, coverage, or limits change. Keep a dated copy or citation for
 every published claim.
-

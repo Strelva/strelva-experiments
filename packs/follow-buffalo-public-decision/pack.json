@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "id": "buffalo-public-evidence",
-  "name": "Buffalo public evidence",
+  "id": "follow-buffalo-public-decision",
+  "name": "Follow a Buffalo public decision",
   "version": "0.1.0",
   "status": "public-preview",
   "description": "A human-executable source packet for tracing Buffalo and Erie County public decisions from notice and agenda to minutes, recordings, records, and supporting data.",
@@ -28,4 +28,3 @@
   ],
   "license": "MIT"
 }
-

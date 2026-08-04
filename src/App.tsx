@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { MAX_PROMPTS, type AssistantTurn, type ChatResponse, type UserTurn } from "./chat";
-import { SOURCE_REVIEWED_AT } from "../skills/buffalo-business-navigator/config.ts";
+import { SOURCE_REVIEWED_AT } from "../skills/find-buffalo-business-help/config.ts";
 
 const examples = [
   "I want to open a restaurant with a patio in Buffalo.",
@@ -12,7 +12,7 @@ type ThreadTurn = UserTurn | AssistantTurn;
 
 function SourceAnswer({ answer }: { answer: AssistantTurn }) {
   return (
-    <section className="answer" aria-label="Navigator response">
+    <section className="answer" aria-label="Business help response">
       <div className="answer-mark" aria-hidden="true">B</div>
       <div className="answer-body">
         <p className="answer-summary">{answer.summary}</p>
@@ -84,7 +84,7 @@ export function App() {
       <div className="thread-shell">
         {!turns.length && (
           <section className="empty-state">
-            <p>Buffalo Business Navigator</p>
+            <p>Find Buffalo Business Help</p>
             <h1>What does your<br />business need<span>?</span></h1>
             <p className="lede">Describe your goal. Get useful places to start from official Buffalo, Erie County, and New York State sources.</p>
           </section>

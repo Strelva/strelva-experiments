@@ -2,7 +2,7 @@
 
 Public experiments and reusable research packs from Strelva Labs.
 
-## Buffalo Business Navigator
+## Find Buffalo Business Help
 
 A small Strelva Labs chat experiment that connects an ordinary business description to useful Buffalo, Erie County, and New York State resources.
 

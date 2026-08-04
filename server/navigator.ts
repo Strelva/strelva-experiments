@@ -2,9 +2,9 @@ import { Codex } from "@openai/codex-sdk";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildNavigatorPrompt, navigatorOutputSchema, parseNavigatorOutput } from "../skills/buffalo-business-navigator/agent.ts";
-import { findOpportunities, OPPORTUNITIES, type OpportunityMatch } from "../skills/buffalo-business-navigator/catalog.ts";
-import { NAVIGATOR_MODEL } from "../skills/buffalo-business-navigator/config.ts";
+import { buildNavigatorPrompt, navigatorOutputSchema, parseNavigatorOutput } from "../skills/find-buffalo-business-help/agent.ts";
+import { findOpportunities, OPPORTUNITIES, type OpportunityMatch } from "../skills/find-buffalo-business-help/catalog.ts";
+import { NAVIGATOR_MODEL } from "../skills/find-buffalo-business-help/config.ts";
 import { MAX_PROMPTS, type ChatRequest, type ChatResponse } from "../src/chat.ts";
 
 export class NavigatorUnavailableError extends Error {

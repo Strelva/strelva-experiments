@@ -1,9 +1,9 @@
 ---
-name: buffalo-property-sources
-description: Build a dated, source-linked property evidence record for a Buffalo or Erie County address without declaring vacancy, ownership, safety, or compliance.
+name: research-buffalo-property
+description: Research a Buffalo or Erie County address and build a dated, source-linked property record without declaring vacancy, ownership, safety, or compliance.
 ---
 
-# Buffalo property sources method
+# Research a Buffalo property
 
 ## Input
 
@@ -76,4 +76,3 @@ Return a dated note containing:
 - If a user asks whether a property is legal, safe, vacant, or theirs, describe
   the records that can be checked and suggest contacting the responsible office
   or a qualified professional. Do not answer the legal or safety question.
-

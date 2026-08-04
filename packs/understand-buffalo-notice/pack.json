@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "id": "buffalo-action-case",
-  "name": "Buffalo action case",
+  "id": "understand-buffalo-notice",
+  "name": "Understand a Buffalo notice",
   "version": "0.1.0",
   "status": "public-preview",
   "description": "A human-executable method for organizing a Buffalo or Erie County notice, deadline, hearing, records denial, or appeal without making a legal determination.",
@@ -28,4 +28,3 @@
   ],
   "license": "MIT"
 }
-

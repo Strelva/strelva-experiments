@@ -8,9 +8,9 @@ one has a source catalog, a plain-language method, and explicit limits.
 
 | Pack | Use it for | Core output |
 | --- | --- | --- |
-| [buffalo-property-sources](./buffalo-property-sources/) | Parcel, ownership, vacancy signals, permits, and property condition research | A dated property evidence record with source links and unresolved questions |
-| [buffalo-public-evidence](./buffalo-public-evidence/) | Following public decisions, meetings, records, and supporting evidence | A claim-to-source ledger that separates official action from inference |
-| [buffalo-action-case](./buffalo-action-case/) | Organizing a notice, deadline, hearing, or appeal | A fact timeline and next-contact checklist tied to the issuing agency |
+| [Research a Buffalo property](./research-buffalo-property/) | Parcel, ownership, vacancy signals, permits, and property condition research | A dated property evidence record with source links and unresolved questions |
+| [Follow a Buffalo public decision](./follow-buffalo-public-decision/) | Following public decisions, meetings, records, and supporting evidence | A claim-to-source ledger that separates official action from inference |
+| [Understand a Buffalo notice](./understand-buffalo-notice/) | Organizing a notice, deadline, hearing, or appeal | A fact timeline and next-contact checklist tied to the issuing agency |
 
 ## Use a pack
 
@@ -35,4 +35,3 @@ When a URL, publisher, purpose, or limitation changes, update the source entry,
 the pack README if needed, and the `reviewedAt` field in both JSON files. Keep
 the pack at `0.1.0` for content corrections; increment the version when the
 method or contract changes.
-

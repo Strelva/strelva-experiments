@@ -1,9 +1,9 @@
 ---
-name: buffalo-business-navigator
-description: Match a Buffalo-area business goal to reviewed official City of Buffalo, Erie County, and New York State resources without making eligibility claims.
+name: find-buffalo-business-help
+description: Find reviewed official City of Buffalo, Erie County, and New York State resources for something a Buffalo-area business wants to start, fund, permit, grow, or sell, without making eligibility claims.
 ---
 
-# Buffalo Business Navigator
+# Find Buffalo business help
 
 Use this skill when a person describes something they want to start, fund,
 permit, grow, or sell through a Buffalo-area business.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Follow a Buffalo Public Decision"
+  short_description: "Trace a Buffalo decision through public records"
+  default_prompt: "Use $follow-buffalo-public-decision to trace this Buffalo public decision through official records."

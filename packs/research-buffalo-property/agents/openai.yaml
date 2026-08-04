@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research a Buffalo Property"
+  short_description: "Build a sourced record for a Buffalo property"
+  default_prompt: "Use $research-buffalo-property to research a Buffalo address using official public sources."

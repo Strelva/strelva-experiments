@@ -1,0 +1,4 @@
+interface:
+  display_name: "Find Buffalo Business Help"
+  short_description: "Find official business resources in Buffalo"
+  default_prompt: "Use $find-buffalo-business-help to find official Buffalo business resources for the goal I describe."
