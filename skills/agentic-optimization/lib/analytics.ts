@@ -4,15 +4,27 @@ import { call, searchRows } from "./google.ts"
 const ADMIN = "https://analyticsadmin.googleapis.com/v1beta"
 const DATA = "https://analyticsdata.googleapis.com"
 
-export type Property = { property: string; name: string; account: string; websites: string[] }
+export type Property = { property: string; name: string; account: string; websites: string[]; error?: string }
 
 /** Every GA4 property this account can see, with the website each one measures. */
 export async function listProperties(token: string): Promise<Property[]> {
-  const r = await call<{ accountSummaries?: { displayName: string; propertySummaries?: { property: string; displayName: string }[] }[] }>(token, `${ADMIN}/accountSummaries?pageSize=200`)
-  const props = (r.accountSummaries ?? []).flatMap((a) => (a.propertySummaries ?? []).map((p) => ({ property: p.property, name: p.displayName, account: a.displayName })))
+  type Page = { accountSummaries?: { displayName: string; propertySummaries?: { property: string; displayName: string }[] }[]; nextPageToken?: string }
+  const summaries: NonNullable<Page["accountSummaries"]> = []
+  let pageToken = ""
+  do {
+    const r: Page = await call<Page>(token, `${ADMIN}/accountSummaries?pageSize=200${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ""}`)
+    summaries.push(...(r.accountSummaries ?? []))
+    pageToken = r.nextPageToken ?? ""
+  } while (pageToken)
+  const props = summaries.flatMap((a) => (a.propertySummaries ?? []).map((p) => ({ property: p.property, name: p.displayName, account: a.displayName })))
   return Promise.all(props.map(async (p) => {
-    const s = await call<{ dataStreams?: { webStreamData?: { defaultUri?: string } }[] }>(token, `${ADMIN}/${p.property}/dataStreams`).catch(() => ({ dataStreams: [] }))
-    return { ...p, websites: (s.dataStreams ?? []).flatMap((d) => (d.webStreamData?.defaultUri ? [d.webStreamData.defaultUri] : [])) }
+    try {
+      const s = await call<{ dataStreams?: { webStreamData?: { defaultUri?: string } }[] }>(token, `${ADMIN}/${p.property}/dataStreams`)
+      return { ...p, websites: (s.dataStreams ?? []).flatMap((d) => (d.webStreamData?.defaultUri ? [d.webStreamData.defaultUri] : [])) }
+    } catch (e) {
+      // Say so, rather than look like a property with no website.
+      return { ...p, websites: [], error: (e as Error).message }
+    }
   }))
 }
 
@@ -33,7 +45,8 @@ async function report(token: string, property: string, body: object): Promise<{ 
   return (r.rows ?? []).map((row) => ({ keys: (row.dimensionValues ?? []).map((d) => d.value), values: (row.metricValues ?? []).map((m) => Number(m.value)) }))
 }
 
-export type Step = { name: string; users: number; completionRate: number; abandonments: number }
+/** completionRate and abandonments are about moving on to the next step, so the last step has none. */
+export type Step = { name: string; users: number; completionRate: number | null; abandonments: number | null }
 
 /**
  * Where people drop out between steps, over the last 28 days. Each step is "event:<name>" (like
@@ -51,10 +64,11 @@ export async function runFunnel(token: string, property: string, steps: string[]
     funnel: { steps: steps.map((s) => ({ name: s, filterExpression: expression(s) })) },
   })
   // GA4 leaves out steps nobody reached; they count as zero.
-  const byName = new Map((r.funnelTable?.rows ?? []).map((row) => [row.dimensionValues?.[0]?.value.replace(/^\d+\.\s*/, "") ?? "", (row.metricValues ?? []).map((m) => Number(m.value))]))
-  return steps.map((s) => {
-    const [users = 0, completionRate = 0, abandonments = 0] = byName.get(s) ?? []
-    return { name: s, users, completionRate, abandonments }
+  // Rows are named "1. <step>"; key them by number, so two steps with the same name stay apart.
+  const byIndex = new Map((r.funnelTable?.rows ?? []).map((row) => [Number(row.dimensionValues?.[0]?.value.match(/^(\d+)\./)?.[1]) - 1, (row.metricValues ?? []).map((m) => Number(m.value))]))
+  return steps.map((s, i) => {
+    const [users = 0, completionRate = 0, abandonments = 0] = byIndex.get(i) ?? []
+    return i === steps.length - 1 ? { name: s, users, completionRate: null, abandonments: null } : { name: s, users, completionRate, abandonments }
   })
 }
 
@@ -74,7 +88,7 @@ export type Traffic = {
 }
 
 /** Events sites often send for the action that matters: a sale, a sign-up, a lead. */
-const LIKELY_KEY = /^(purchase|sign_?up|generate_lead|form_submit|contact|book|booking|schedule|subscribe|begin_checkout|call|click_to_call|request_quote|quote|submit)/i
+const LIKELY_KEY = /^(purchase|generate_lead|form_submit|submit_form|begin_checkout|click_to_call|phone_call|call_click|request_quote|quote_request|contact(_form)?_submit(ted)?|(sign_?up|subscribe|booking|book_appointment|schedule_appointment)(_complete(d)?|_success)?)$/i
 
 /** GA4 traffic for the same 28 days as the search report, with each landing page next to its Search Console numbers. */
 export async function runTraffic(token: string, property: string, site: string, window: { start: string; end: string }, prev: { start: string; end: string }): Promise<Traffic> {
@@ -86,7 +100,7 @@ export async function runTraffic(token: string, property: string, site: string, 
     report(token, property, { dateRanges: [both[1]], metrics: [{ name: "sessions" }], dimensionFilter: organic }),
     report(token, property, { dateRanges: [both[0]], metrics: [{ name: "sessionKeyEventRate" }], dimensionFilter: organic }),
     report(token, property, { dateRanges: [both[0]], dimensions: [{ name: "eventName" }], metrics: [{ name: "eventCount" }], limit: 100 }),
-    report(token, property, { dateRanges: [both[0]], dimensions: [{ name: "landingPage" }], metrics: [{ name: "sessions" }, { name: "keyEvents" }, { name: "engagementRate" }, { name: "sessionKeyEventRate" }], dimensionFilter: organic, orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 500 }),
+    report(token, property, { dateRanges: [both[0]], dimensions: [{ name: "hostName" }, { name: "landingPage" }], metrics: [{ name: "sessions" }, { name: "keyEvents" }, { name: "engagementRate" }, { name: "sessionKeyEventRate" }], dimensionFilter: organic, orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 2000 }),
     listKeyEvents(token, property),
     searchRows(token, site, window.start, window.end, ["page"]),
   ])
@@ -100,19 +114,38 @@ export async function runTraffic(token: string, property: string, site: string, 
   }
   const events = eventRows.map((r) => ({ name: r.keys[0], count: r.values[0], key: keyEvents.includes(r.keys[0]) }))
 
-  // Search Console gives full addresses, GA4 gives paths. Match on the path without a trailing slash.
-  const norm = (p: string) => (p.replace(/[?#].*$/, "").replace(/\/+$/, "") || "/")
+  // Search Console gives full addresses; GA4 gives a host and a landing page with its query string.
+  // Both are keyed as host (without www) + decoded path without the query or a trailing slash.
+  const host = (h: string) => h.toLowerCase().replace(/^www\./, "")
+  const path = (p: string) => {
+    const bare = p.replace(/[?#].*$/, "").replace(/\/+$/, "") || "/"
+    try { return decodeURIComponent(bare) } catch { return bare }
+  }
   const search = new Map<string, { clicks: number; impressions: number }>()
   for (const r of gsc) {
-    let path: string
-    try { path = norm(new URL(r.keys[0]).pathname) } catch { continue }
-    const s = search.get(path) ?? { clicks: 0, impressions: 0 }
-    search.set(path, { clicks: s.clicks + r.clicks, impressions: s.impressions + r.impressions })
+    let key: string
+    try { const u = new URL(r.keys[0]); key = host(u.hostname) + path(u.pathname) } catch { continue }
+    const s = search.get(key) ?? { clicks: 0, impressions: 0 }
+    search.set(key, { clicks: s.clicks + r.clicks, impressions: s.impressions + r.impressions })
   }
-  const pages = pageRows.filter((r) => r.keys[0] && r.keys[0] !== "(not set)").map((r) => ({
-    path: r.keys[0], organicSessions: r.values[0], keyEvents: r.values[1], convertRate: Math.round(r.values[3] * 1000) / 1000, engagementRate: Math.round(r.values[2] * 100) / 100,
-    ...(search.get(norm(r.keys[0])) ?? { clicks: 0, impressions: 0 }),
-  }))
+  // One row per page: GA4 splits a page by query string (?utm_source=...), which would double-count it.
+  const merged = new Map<string, { host: string; path: string; sessions: number; keyEvents: number; withKey: number; engaged: number }>()
+  for (const r of pageRows) {
+    if (!r.keys[1] || r.keys[1] === "(not set)") continue
+    const key = host(r.keys[0]) + path(r.keys[1])
+    const m = merged.get(key) ?? { host: host(r.keys[0]), path: path(r.keys[1]), sessions: 0, keyEvents: 0, withKey: 0, engaged: 0 }
+    m.sessions += r.values[0]; m.keyEvents += r.values[1]; m.engaged += r.values[2] * r.values[0]; m.withKey += r.values[3] * r.values[0]
+    merged.set(key, m)
+  }
+  // Show the host only when the property measures more than one.
+  const manyHosts = new Set([...merged.values()].map((m) => m.host)).size > 1
+  const pages = [...merged].map(([key, m]) => ({
+    path: manyHosts ? m.host + m.path : m.path,
+    organicSessions: m.sessions, keyEvents: m.keyEvents,
+    convertRate: m.sessions ? Math.round((m.withKey / m.sessions) * 1000) / 1000 : 0,
+    engagementRate: m.sessions ? Math.round((m.engaged / m.sessions) * 100) / 100 : 0,
+    ...(search.get(key) ?? { clicks: 0, impressions: 0 }),
+  })).sort((a, b) => b.organicSessions - a.organicSessions)
 
   const fixes: TrafficFix[] = []
   const notes: string[] = []
@@ -144,8 +177,8 @@ export async function runTraffic(token: string, property: string, site: string, 
     for (const p of pages.filter((p) => p.organicSessions >= 20 && p.keyEvents === 0).slice(0, 3)) {
       fixes.push({
         id: `search-no-convert:${p.path}`, kind: "search-no-convert", page: p.path,
-        headline: `Search brings people to ${p.path}, but none of them convert`,
-        evidence: [`${fmt(p.organicSessions)} visits from Google in 28 days, none ended in a key event.`, `Across the site, ${pct(rate)} of search visits do.`],
+        headline: `Search engines bring people to ${p.path}, but none of them convert`,
+        evidence: [`${fmt(p.organicSessions)} visits from search engines in 28 days, none with a key event.`, `Across the site, ${pct(rate)} of search visits have one.`],
         todo: ["Make the next step obvious on this page: one clear button or form above the fold, matching what people searched for.", "Link to the page that converts best."],
       })
     }
@@ -153,12 +186,13 @@ export async function runTraffic(token: string, property: string, site: string, 
       fixes.push({
         id: `converts-hidden:${p.path}`, kind: "converts-hidden", page: p.path,
         headline: `${p.path} turns search visits into customers. Get it seen more`,
-        evidence: [`${pct(p.convertRate)} of its ${fmt(p.organicSessions)} search visits ended in a key event, against ${pct(rate)} site-wide.`, `Google showed it only ${fmt(p.impressions)} times in 28 days.`],
+        evidence: [`${pct(p.convertRate)} of its ${fmt(p.organicSessions)} search visits had a key event, against ${pct(rate)} site-wide.`, `Google showed it only ${fmt(p.impressions)} times in 28 days.`],
         todo: ["Link to it from the homepage and your most-visited pages.", "Use the search report's fixes for this page first (title, almost on page one)."],
       })
     }
   }
   if (totals.sessions < 100) notes.push("Under 100 visits in 28 days: too little to judge pages yet.")
+  if (totals.keyEvents > 0 && totals.keyEventsPrev === 0) notes.push("No key events were counted in the 28 days before, so tracking probably started recently. Don't present the change as growth.")
   if (!pages.length) notes.push("No visits from Google search were recorded in 28 days.")
   return { property, window, totals, channels, keyEvents, events, pages: pages.slice(0, 25), fixes, notes }
 }

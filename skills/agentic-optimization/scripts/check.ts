@@ -13,14 +13,14 @@
  * --save (report, traffic, daily) writes to the log folder instead of printing, for scheduled runs (scripts/schedule.ts).
  * Exit codes: 0 ok, 1 bad input or an error (message on stderr), 2 needs sign-in (run scripts/sign-in.ts).
  */
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { appendFileSync, readFileSync, writeFileSync } from "node:fs"
 import { execFile } from "node:child_process"
 import { join } from "node:path"
 import { listSites, pageDaily, refreshAccessToken, SignInNeeded, sitemapDetails, submitSitemap } from "../lib/google.ts"
 import { createKeyEvent, listKeyEvents, listProperties, runFunnel, runTraffic } from "../lib/analytics.ts"
 import { runReport } from "../lib/fixes.ts"
 import { runWatch } from "../lib/watch.ts"
-import { dir, loadToken, logDir, tokenPath } from "./store.ts"
+import { dir, ensureDirs, loadToken, logDir, tokenPath } from "./store.ts"
 
 const flags = new Set(process.argv.slice(2).filter((a) => a.startsWith("--")))
 const [command, ...args] = process.argv.slice(2).filter((a) => !a.startsWith("--"))
@@ -95,7 +95,7 @@ try {
         after: { from: day(done, 1), to: day(done, 14), ...total(day(done, 1), day(done, 14)) },
         complete: today >= ready,
         completeOn: ready,
-        ...(rows.length ? {} : { warning: "No data at all for this address. Check it matches the report exactly (https, www, trailing slash)." }),
+        ...(rows.length ? {} : { warning: "No data at all for this address, counting http/https, www and a trailing slash. Check the path matches the report." }),
       })
     } else if (command === "sitemaps") {
       print(await sitemapDetails(token, site))
@@ -114,12 +114,14 @@ try {
       const w = await runWatch(token, site, dir, args[1] ? property(args[1]) : undefined)
       if (!flags.has("--save")) print(w)
       else {
-        mkdirSync(logDir, { recursive: true })
+        ensureDirs()
         const log = join(logDir, "daily.jsonl")
         // Notify only about problems that weren't there yesterday, so an unfixed one doesn't nag every morning.
         let seen = new Set<string>()
         try {
-          const last = readFileSync(log, "utf8").trim().split("\n").reverse().map((l) => JSON.parse(l) as typeof w).find((x) => x.site === site)
+          // Line by line, so one cut-off line from a crash doesn't turn the de-duplication off for good.
+          const parse = (l: string) => { try { return JSON.parse(l) as typeof w } catch { return null } }
+          const last = readFileSync(log, "utf8").trim().split("\n").reverse().map(parse).find((x) => x?.site === site)
           seen = new Set(last?.alerts.map((a) => a.id))
         } catch {}
         appendFileSync(log, JSON.stringify(w) + "\n")
@@ -131,17 +133,17 @@ try {
 } catch (e) {
   // A scheduled run has no one watching the terminal: log the failure and say so on screen.
   if (flags.has("--save")) {
-    mkdirSync(logDir, { recursive: true })
+    ensureDirs()
     appendFileSync(join(logDir, "errors.jsonl"), JSON.stringify({ at: new Date().toISOString(), command, args, error: (e as Error).message }) + "\n")
     notify(e instanceof SignInNeeded ? "The Google sign-in needs renewing. Ask your agent." : `A scheduled check failed: ${(e as Error).message.slice(0, 120)}`)
   }
-  if (e instanceof SignInNeeded) needsSignIn(e.message, !!loadToken() && !e.message.includes("client"))
+  if (e instanceof SignInNeeded) needsSignIn(e.message, (() => { try { return !!loadToken() } catch { return false } })() && !e.message.includes("client"))
   console.error((e as Error).message)
   process.exit(1)
 }
 
 function save(name: string, x: unknown) {
-  mkdirSync(logDir, { recursive: true })
+  ensureDirs()
   writeFileSync(join(logDir, name), JSON.stringify(x, null, 2))
   console.log(`Saved ${join(logDir, name)}`)
 }

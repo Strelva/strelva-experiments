@@ -14,9 +14,10 @@ export async function call<T>(token: string, url: string, body?: object, method 
     cache: "no-store",
   }).catch((e: Error) => { throw new Error(`Couldn't reach Google (${e.message}). Check the internet connection and try again.`) })
   const api = new URL(url).hostname.startsWith("analytics") ? "Google Analytics" : "Search Console"
+  const read = () => res.text().catch((e: Error) => { throw new Error(`Couldn't reach Google (${e.message}). Check the internet connection and try again.`) })
   if (!res.ok) {
     // Google puts the useful part (like "enable the API at <link>") in error.message.
-    const text = await res.text()
+    const text = await read()
     let message = text.slice(0, 500)
     try { message = (JSON.parse(text) as { error?: { message?: string } }).error?.message ?? message } catch {}
     if (res.status === 403 && /insufficient authentication scopes|ACCESS_TOKEN_SCOPE_INSUFFICIENT/i.test(text)) {
@@ -24,7 +25,7 @@ export async function call<T>(token: string, url: string, body?: object, method 
     }
     throw new Error(`${api}: HTTP ${res.status}: ${message}`)
   }
-  const text = await res.text()
+  const text = await read()
   return (text ? JSON.parse(text) : {}) as T
 }
 
@@ -70,12 +71,17 @@ export async function searchRows(token: string, site: string, start: string, end
 
 /**
  * Daily clicks and impressions for one page, for the before/after view. The report merges http/https and
- * www/no-www into one address, so this counts all of them too.
+ * www/no-www into one address, so this counts all of them too, with or without a trailing slash and with
+ * non-English characters written either way (/café or /caf%C3%A9).
  */
 export async function pageDaily(token: string, site: string, page: string, start: string, end: string): Promise<Row[]> {
   const u = new URL(page)
   const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-  const expression = `^https?://(www\\.)?${esc(u.hostname.replace(/^www\./, ""))}${esc(u.pathname + u.search)}$`
+  const bare = u.pathname.replace(/\/+$/, "")
+  let decoded = bare
+  try { decoded = decodeURIComponent(bare) } catch {}
+  const paths = [...new Set([bare, decoded])].map(esc).join("|")
+  const expression = `^https?://(www\\.)?${esc(u.hostname.replace(/^www\./, ""))}(${paths})/?${esc(u.search)}$`
   const r = await call<{ rows?: Row[] }>(token, `${GSC}/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`, {
     startDate: start, endDate: end, dimensions: ["date"], rowLimit: 1000,
     dimensionFilterGroups: [{ filters: [{ dimension: "page", operator: "includingRegex", expression }] }],
@@ -88,7 +94,8 @@ export type Sitemap = { path: string; lastSubmitted?: string; lastDownloaded?: s
 /** The sitemaps Search Console has for the site, with when Google last read each and any errors. */
 export async function sitemapDetails(token: string, site: string): Promise<Sitemap[]> {
   const r = await call<{ sitemap?: Sitemap[] }>(token, `${GSC}/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps`)
-  return r.sitemap ?? []
+  // Google no longer fills in contents[].indexed (it reads 0), so it's left out rather than misread.
+  return (r.sitemap ?? []).map((s) => ({ ...s, contents: s.contents?.map((c) => ({ type: c.type, submitted: c.submitted })) }))
 }
 
 export async function listSitemaps(token: string, site: string): Promise<string[]> {

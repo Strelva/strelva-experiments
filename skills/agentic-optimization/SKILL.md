@@ -145,7 +145,7 @@ Then run `node scripts/check.ts sites` again to confirm.
 `sites` prints one line per site: the Search Console name, a tab, then the access level.
 
 - Pick the line that matches the address the owner gave you. Don't read the whole list out: some accounts see dozens of sites.
-- If both `sc-domain:example.com` and `https://example.com/` are listed, use `sc-domain:`. It covers the whole domain.
+- If both `sc-domain:example.com` and `https://example.com/` are listed, use `sc-domain:`. It covers the whole domain. The Analytics property's website may be written differently (with `www`, or a trailing slash); that's normal.
 - If nothing matches their address, tell them which sites this account can see, and ask whether it's the right Google account.
 
 If they use Google Analytics:
@@ -179,11 +179,11 @@ It takes 20 seconds to 2 minutes. It reads Search Console, opens the site's most
 | kind | Problem |
 | --- | --- |
 | `retitle` | Google shows the page often but few people click. The title or description doesn't match what people searched. |
-| `almost` | The page is just off page one for a search. |
+| `almost` | The page is at the bottom of page one (position 9 to 10) or just off it (11 to 20) for a search. The headline says which. |
 | `missing-page` | People search for something and the site has no page really about it. |
 | `split` | Two of the site's pages compete for the same search. |
 | `moved` | Google still shows old addresses that redirect badly: to the homepage, or through several hops. |
-| `not-indexed` | Pages in the sitemap that Google hasn't added, or no sitemap at all. |
+| `not-indexed` | Pages in the sitemap that Google hasn't added, or no sitemap at all. The pages checked are a sample of sitemap pages that got no views, not of the whole site, so say "of the unseen pages we checked", never "of your site". |
 | `page-problem` | A page people find returns an error, has a noindex tag, has a canonical tag pointing elsewhere, or has no title. |
 | `more-like-this` | A page that works well, plus related searches to write the next page for. |
 
@@ -201,13 +201,19 @@ Same 28 days as the search report, so the two line up. It prints JSON:
 
 | Field | What it is |
 | --- | --- |
-| `totals` | `sessions` (visits), `organicSessions` (visits from Google search) and `keyEvents` (sales, sign-ups, leads: whatever the site counts), each with the 28 days before. |
+| `totals` | `sessions` (visits), `organicSessions` (visits from all search engines, not only Google) and `keyEvents` (how many key events happened: sales, sign-ups, leads, whatever the site counts), each with the 28 days before. |
 | `channels` | Visits and key events by where people came from (Organic Search, Direct, AI Assistant, and so on). |
 | `keyEvents` | The events GA4 counts as key events. |
 | `events` | Every event GA4 received, with `count` and `key: true` if it's a key event. Use these names for funnels. |
-| `pages` | Pages people land on from Google search: `organicSessions`, `keyEvents`, `convertRate` (share of those visits that ended in a key event), `engagementRate`, and the page's Search Console `clicks` and `impressions`. |
+| `pages` | Pages people land on from search engines: `organicSessions`, `keyEvents`, `convertRate` (share of those visits with at least one key event), `engagementRate`, and the page's Search Console `clicks` and `impressions`. |
 | `fixes` | Like the search report's, with these kinds: |
 | `notes` | Read them all. |
+
+Reading the numbers right:
+
+- `keyEvents` counts events, and one visit can have several (a sign-up and a checkout). So say "36 key events", not "36 people signed up". `convertRate` is the one that's per visit. Each key event follows its own counting setting in GA4, so `keyEvents` can be lower than that event's `count` in `events`.
+- `organicSessions` includes Bing, DuckDuckGo and other search engines, and counts visits, while Search Console counts Google clicks. The two won't match; don't compare them as if they should.
+- If a note says key events weren't counted in the 28 days before, tracking started recently. Never call that growth.
 
 | kind | Problem |
 | --- | --- |
@@ -227,7 +233,7 @@ First, if `done.json` exists, read it. A fix made in the last 28 days can still 
 
 Then:
 
-1. **One or two lines on the trend.** From the search `totals`: "Google showed your site 1,077 times in the last 28 days, up from 124. It got 6 clicks, up from 3." With Analytics, add visits from search and key events: "Search brought 3,819 visits, and 36 of them signed up."
+1. **One or two lines on the trend.** From the search `totals`: "Google showed your site 1,077 times in the last 28 days, up from 124. It got 6 clicks, up from 3." With Analytics, add visits from search and key events: "Search engines brought 3,819 visits, with 36 key events (sign-ups, checkouts and the like)."
 2. **The top 3 to 5 fixes.** A `no-key-events` or `key-events-silent` fix goes first, because without it no result can be measured. Then the search report's fixes in its order, with Analytics fixes placed where they fit (a `search-no-convert` page with hundreds of visits outranks a small retitle). For each fix:
    - what's wrong, in one sentence, from `headline`;
    - the one or two `evidence` lines that prove it;
@@ -291,7 +297,12 @@ node scripts/check.ts funnel properties/123456789 page:/ page:/pricing event:beg
 
 Each step is `event:<name>` (an event from `events` in the traffic report) or `page:/<path>` (pages whose path starts with it). Pick 3 to 5 steps that match how a customer actually gets to the main action on this site. Look at the site's pages and the `events` list to work it out, and check the steps with the owner.
 
-It returns, for the last 28 days, each step's `users`, `completionRate` (share who went on to the next step) and `abandonments`. A `warning` means nobody matched the first step: check the event name or path.
+It covers the 28 days ending yesterday (Analytics doesn't lag like Search Console does, so this window ends later than the reports'). Only people who did step 1 count, and each later step counts people who went on to do it after the step before, in order, at any point in those 28 days. Each step has `users`, plus `completionRate` (share who went on to the next step) and `abandonments`; those are `null` on the last step, which has no next step. A `warning` means nobody matched the first step: check the event name or path.
+
+Choosing steps:
+
+- Start with the step every customer passes, like the first view of the upgrade screen or the pricing page. Don't start with `page:/` unless people only reach the next step from the homepage, or you'll undercount.
+- If `events` has two similar names (like `paywall_viewed` and `paywall_seen`), run the funnel with each, tell the owner which you used and why, and ask which one fires on the real screen.
 
 Present the step where the most people leave, in numbers: "691 people saw the upgrade screen, 38 clicked upgrade, 13 subscribed." Then suggest one fix for that step (clearer copy, fewer form fields, a missing link), and make it with the owner's yes like any other fix. If a step you need has no event, add tracking for it (step 7). Run the same funnel again 2 to 4 weeks after a fix to compare.
 
@@ -305,10 +316,10 @@ node scripts/schedule.ts sc-domain:example.com properties/123456789 --confirm
 
 (Leave out the property if they don't use Analytics.) This uses cron, on macOS and Linux:
 
-- **Every day at 8:00:** the quick check (`daily`). It looks for clicks falling sharply week on week, sitemap errors, a sitemap Google stopped reading, an error or noindex on the pages Google sends the most people to, Analytics going silent, key events dropping by half, and logged fixes that are now due a check. If it finds something new and serious, the computer shows a notification.
-- **Every Monday at 8:30:** the full search report, plus the traffic report with Analytics.
+- **Every day at 8:00:** the quick check (`daily`). It looks for clicks falling sharply week on week, sitemap errors, a sitemap Google stopped reading, an error or noindex on the pages Google sends the most people to, Analytics going silent, key events dropping by half, and logged fixes that are now due a check. If it finds something new and serious (a `warn` alert), the computer shows a notification. Fixes coming due are `info`: they wait in the log for your next visit.
+- **Every Monday at 8:30:** the full search report, and at 8:35 the traffic report if they use Analytics.
 
-Results go to `~/.config/agentic-optimization/log/`: `daily.jsonl` (one line per day), `report-<date>.json`, `traffic-<date>.json`, `errors.jsonl` if a run failed, and `cron.log` with anything a run printed. Notifications are only for problems that weren't there the day before. `node scripts/schedule.ts` shows what's scheduled, and `--remove [<site>] --confirm` stops it. The owner's other cron jobs are kept, and the previous crontab is saved to `log/crontab.bak`.
+Results go to `log/` in the config folder (`~/.config/agentic-optimization/log/`, or under `$AGENTIC_OPTIMIZATION_DIR`): `daily.jsonl` (one line per day), `report-<date>.json`, `traffic-<date>.json`, `errors.jsonl` if a run failed, and `cron.log` with anything a run printed. Notifications are only for problems that weren't there the day before. `node scripts/schedule.ts` shows what's scheduled, and `--remove [<site>] --confirm` stops it. The owner's other cron jobs are kept, and the previous crontab is saved to `crontab.bak` in the config folder. Don't open that one: it's the owner's whole crontab and can hold other tools' secrets.
 
 Things to tell the owner, briefly:
 
@@ -328,7 +339,7 @@ Then present it as in step 6, starting with anything that broke. You can run `no
 
 ## 10. Checking a fix worked
 
-When a fix is live, add an entry to `~/.config/agentic-optimization/done.json`. Create the file if it's missing. It's a JSON array that only you edit, so keep it valid JSON.
+When a fix is live, add an entry to `done.json` in the config folder (`~/.config/agentic-optimization/`, or `$AGENTIC_OPTIMIZATION_DIR` if set). If it's missing, create it with your file tools, containing a JSON array. Only you edit it, so keep it valid JSON; the daily check warns if it isn't.
 
 ```json
 [
@@ -350,9 +361,14 @@ node scripts/check.ts compare sc-domain:example.com https://www.example.com/menu
 It returns clicks and impressions for the 14 days `before` and the 14 days `after` that date.
 
 - **`complete` is false.** It's too early. Say they can check on `completeOn`: 17 days after the change, because the data lags 3 days.
-- **There's a `warning` about no data.** It already counts http and https, www and not. Check the path and the trailing slash match the report.
+- **There's a `warning` about no data.** It already counts http and https, www and not, and a trailing slash or not. Check the path itself matches the report.
 - **Under about 50 impressions in either window.** Too little data to tell.
 - **Otherwise,** give the clicks and impressions for both windows. One page over 14 days is noisy, so only call it a win if the change is clear, like clicks doubling. Otherwise say there's no clear change yet.
+- **A clear drop** (clicks or impressions roughly halving): say so plainly, without claiming the change caused it. Seasons, news and the site's own schedule move pages too. Check live that the change is still as logged, then offer either to undo it or to try a different change, and compare again two to three weeks later.
+
+When `complete` is false, don't quote the `after` numbers: the window isn't over.
+
+If the page's title is generated (it has a date or a count in it that changes), say the before and after can only show the trend, not prove what the title change did.
 
 The daily check flags fixes as they come due. When the owner asks how their fixes went:
 

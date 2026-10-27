@@ -1,10 +1,16 @@
 /** Where the sign-in lives: ~/.config/agentic-optimization, or $AGENTIC_OPTIMIZATION_DIR. done.json (finished fixes) and log/ (scheduled runs) sit next to it. */
 import { chmodSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 
-export const dir = process.env.AGENTIC_OPTIMIZATION_DIR ?? join(homedir(), ".config", "agentic-optimization")
+// Absolute, so scheduled runs (which start in the home folder) find the same place.
+export const dir = resolve(process.env.AGENTIC_OPTIMIZATION_DIR || join(homedir(), ".config", "agentic-optimization"))
 export const logDir = join(dir, "log")
+
+/** The config and log folders, readable only by the owner: logs hold site data, the backup holds their crontab. */
+export function ensureDirs() {
+  for (const d of [dir, logDir]) { mkdirSync(d, { recursive: true, mode: 0o700 }); chmodSync(d, 0o700) }
+}
 export const tokenPath = join(dir, "token.json")
 
 export type Saved = { client_id: string; client_secret: string; refresh_token: string }
@@ -29,7 +35,8 @@ export function loadToken(): Saved | null {
     throw new Error(`Couldn't open ${tokenPath}: ${(e as Error).message}`)
   }
   try {
-    return JSON.parse(text) as Saved
+    const t = JSON.parse(text) as Saved
+    return t.client_id && t.client_secret && t.refresh_token ? t : null
   } catch {
     return null
   }

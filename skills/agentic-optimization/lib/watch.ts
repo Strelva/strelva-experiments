@@ -40,7 +40,10 @@ export async function runWatch(token: string, site: string, dir: string, propert
 
   // The pages that bring the clicks: one going down costs the most.
   const top = [...pages].sort((a, b) => b.clicks - a.clicks).filter((p) => p.clicks > 0).slice(0, 10)
-  for (const h of await Promise.all(top.map((p) => readPage(p.keys[0])))) {
+  const heads = await Promise.all(top.map((p) => readPage(p.keys[0])))
+  // Every top page failing to load at all usually means the site (or its DNS) is down.
+  if (heads.length >= 3 && heads.every((h) => h.status === 0)) alerts.push({ id: "site-unreachable", level: "warn", message: `None of the ${heads.length} pages Google sends the most people to would load from here (${heads[0].url} included). Check the site is up.` })
+  for (const h of heads) {
     if (h.status === 0 || [401, 403, 429, 503].includes(h.status)) continue
     if (h.status >= 400) alerts.push({ id: `page-down:${h.url}`, level: "warn", message: `${h.url} returns an error (HTTP ${h.status}). It's one of the pages Google sends the most people to.` })
     else if (h.noindex) alerts.push({ id: `page-noindex:${h.url}`, level: "warn", message: `${h.url} now tells Google not to show it (noindex). It's one of the pages Google sends the most people to.` })
@@ -51,7 +54,8 @@ export async function runWatch(token: string, site: string, dir: string, propert
     const gaEnd = now - 2 * DAY
     const rows = await call<{ rows?: { dimensionValues: { value: string }[]; metricValues: { value: string }[] }[] }>(token, `https://analyticsdata.googleapis.com/v1beta/${property}:runReport`, {
       dateRanges: [{ startDate: day(gaEnd - 13 * DAY), endDate: day(now - DAY) }], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "keyEvents" }],
-    }).catch(failed)
+    // A sign-in without Analytics shouldn't stop the Search Console checks; it becomes an alert instead.
+    }).catch((e) => ({ error: (e as Error).message }))
     if ("error" in rows) alerts.push({ id: "analytics-unread", level: "warn", message: `Couldn't read Google Analytics, so its checks didn't run: ${rows.error}` })
     else {
       const ga = (rows.rows ?? []).map((r) => ({ date: `${r.dimensionValues[0].value.slice(0, 4)}-${r.dimensionValues[0].value.slice(4, 6)}-${r.dimensionValues[0].value.slice(6)}`, sessions: Number(r.metricValues[0].value), keyEvents: Number(r.metricValues[1].value) }))

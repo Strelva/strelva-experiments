@@ -7,14 +7,16 @@
  * new shows a desktop notification. The computer has to be awake at those times; a missed run is skipped.
  */
 import { execFileSync, spawnSync } from "node:child_process"
-import { mkdirSync, writeFileSync } from "node:fs"
-import { dirname, join, resolve } from "node:path"
+import { writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { logDir } from "./store.ts"
+import { dir, ensureDirs, logDir } from "./store.ts"
 
 const TAG = "# agentic-optimization"
 const flags = new Set(process.argv.slice(2).filter((a) => a.startsWith("--")))
-const [site, property] = process.argv.slice(2).filter((a) => !a.startsWith("--"))
+const [rawSite, property] = process.argv.slice(2).filter((a) => !a.startsWith("--"))
+// "https://example.com" and "https://example.com/" are one Search Console property; tag them one way.
+const site = rawSite && /^https?:\/\/[^/]+$/i.test(rawSite) ? `${rawSite}/` : rawSite
 
 if (process.platform === "win32") fail("Scheduling uses cron, which Windows doesn't have. Use Task Scheduler to run `node scripts/check.ts daily <site> --save` each morning instead.")
 
@@ -44,15 +46,16 @@ if (!flags.has("--remove")) {
   const check = join(dirname(fileURLToPath(import.meta.url)), "check.ts")
   // The node on PATH (like /opt/homebrew/bin/node) survives Homebrew upgrades; under nvm it's a versioned path.
   const node = (() => { try { return execFileSync("which", ["node"], { encoding: "utf8" }).trim() || process.execPath } catch { return process.execPath } })()
-  const env = process.env.AGENTIC_OPTIMIZATION_DIR ? `AGENTIC_OPTIMIZATION_DIR=${q(resolve(process.env.AGENTIC_OPTIMIZATION_DIR))} ` : ""
+  const env = process.env.AGENTIC_OPTIMIZATION_DIR ? `AGENTIC_OPTIMIZATION_DIR=${q(dir)} ` : ""
   // Output goes to cron.log, so a run that can't even start (no access to the folder, node moved) leaves a trace.
   const run = (...args: string[]) => cron(`${env}${q(node)} ${q(check)} ${args.map(q).join(" ")} --save >>${q(join(logDir, "cron.log"))} 2>&1`)
   lines.push(`0 8 * * * ${run("daily", site, ...(property ? [property] : []))} ${TAG} ${site}`)
   lines.push(`30 8 * * 1 ${run("report", site)} ${TAG} ${site}`)
   if (property) lines.push(`35 8 * * 1 ${run("traffic", site, property)} ${TAG} ${site}`)
 }
-mkdirSync(logDir, { recursive: true })
-writeFileSync(join(logDir, "crontab.bak"), current)
+// The backup sits outside log/ (which the agent reads) and is owner-only: crontabs often hold secrets.
+ensureDirs()
+writeFileSync(join(dir, "crontab.bak"), current, { mode: 0o600 })
 execFileSync("crontab", ["-"], { input: lines.join("\n") + "\n" })
 console.log(flags.has("--remove")
   ? `Removed ${site ? `${site}'s` : "all"} scheduled runs.`
