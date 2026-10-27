@@ -46,7 +46,7 @@ notice-to-resolution casework. Packs do not require the app or an API key.
 [`skills/check-google-search`](./skills/check-google-search/) is an agent skill
 for any website owner. It reads the site's last 28 days of Google Search Console
 data, read-only, and returns a ranked list of fixes with the numbers behind each,
-then checks 14 days later whether a fix worked. It runs on the owner's computer
+then checks about two weeks later whether a fix worked. It runs on the owner's computer
 with their own Google sign-in. See its [README](./skills/check-google-search/README.md).
 
 ## Add or update a source
