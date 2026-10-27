@@ -122,7 +122,7 @@ export async function runReport(token: string, site: string): Promise<Report> {
   const brandPart = label.length >= 4 ? (homeHead.title ?? "").split(/\s[|\-–—:·]\s/).find((t) => squash(t).includes(label)) : undefined
   const brand = [...new Set(words(brandPart ?? "").map((w) => w.replace(/s$/, "")))]
   // Two brand words, one of them part of the domain's name: "joes pizza" yes, "pizza springfield" no.
-  const matchesBrand = (hit: string[]) => hit.length >= 2 && hit.some((x) => label.includes(x))
+  const matchesBrand = (hit: string[]) => hit.length >= 2 && hit.some((x) => x.length >= 4 && label.includes(x))
   const namesBrand = (q: string) => {
     const w = [...new Set(words(q).map((x) => x.replace(/s$/, "")))]
     return (label.length >= 4 && q.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase().includes(label)) || matchesBrand(w.filter((x) => brand.includes(x)))
@@ -359,9 +359,13 @@ export async function runReport(token: string, site: string): Promise<Report> {
       headline: `Google hasn't added ${notIndexed.length} of the ${checked.length} pages we checked`,
       evidence: [
         `${fmt(unseen.length)} of the ${truncated ? "first " : ""}${fmt(listed.length)} pages in your sitemap got no impressions in 28 days. We checked ${checked.length} of them:`,
-        ...notIndexed.slice(0, 6).map((c) => `${pathOf(c.url)}: ${c.coverage}`),
+        ...notIndexed.map((c) => `${pathOf(c.url)}: ${c.coverage}`),
       ],
       todo: [
+        // Nearly the whole sitemap unseen is usually a quality signal, not a links problem.
+        ...(listed.length >= 200 && unseen.length >= 0.9 * listed.length
+          ? [`Almost none of your sitemap's pages get seen in Google. When a site has many similar or generated pages, Google often skips most of them as not worth showing. Make sure each page has something the others don't, and leave thin or near-duplicate pages out of the sitemap so Google spends its time on the best ones.`]
+          : []),
         "Link these pages from pages Google already shows (your homepage, menu, or popular pages). Google finds pages through links, and new sites get crawled slowly.",
         "\"Discovered, not indexed\" means Google knows the page but hasn't got to it yet: more links fix it. \"Crawled, not indexed\" means it looked and passed: the page needs more that's unique to it.",
       ],
@@ -414,7 +418,10 @@ function homeTodo(lead: string, head: PageHead): string[] {
         `Put what you are and where in your homepage title and main heading. They don't say ${gap.map((w) => `"${w}"`).join(", ")}.`,
         `If these searches are about something you do that isn't your main thing, give it its own page and link it from your menu.`,
       ]
-    : [`Your homepage says the right words. Make a page just for "${lead}", link it from your menu, and get it linked from other local sites (your Google Business Profile, local directories).`]
+    : [
+        `Your homepage title and main heading already say "${lead}", so the wording isn't what's holding it back. Climbing for it takes other sites linking to yours: directories, partners, your Google Business Profile, articles that mention you.`,
+        `If "${lead}" is one part of what you do rather than all of it, a page just for it, linked from your menu, helps too.`,
+      ]
 }
 
 /** Spread the sample across sections of the site instead of taking the first 8 of one. */
