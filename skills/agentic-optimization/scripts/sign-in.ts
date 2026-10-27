@@ -3,7 +3,8 @@
  *   node scripts/sign-in.ts path/to/client_secret.json    first time
  *   node scripts/sign-in.ts                               again later, reusing the saved client
  * Opens Google in the browser (and prints the link), waits up to 5 minutes for the owner to approve,
- * then saves a refresh token to ~/.config/check-google-search/token.json. Access is read-only Search Console.
+ * then saves a refresh token to ~/.config/agentic-optimization/token.json. It asks for Search Console and
+ * Google Analytics. Nothing is changed in either without the owner's yes (see SKILL.md).
  */
 import { createHash, randomBytes } from "node:crypto"
 import { execFile } from "node:child_process"
@@ -38,11 +39,18 @@ const server = createServer(async (req, res) => {
       signal: AbortSignal.timeout(30_000),
     }).catch((e: Error) => { throw new Error(`Couldn't reach Google (${e.message}). Check the internet connection and try again.`) })
     const body = (await tok.json().catch(() => ({}))) as { refresh_token?: string; scope?: string; error?: string; error_description?: string }
-    if (!body.refresh_token) throw new Error(`Google refused the sign-in: ${body.error_description ?? body.error ?? `HTTP ${tok.status}, no refresh token`}`)
+    if (body.error === "invalid_client") throw new Error("Google refused the sign-in (invalid_client): the client was deleted or its secret changed. Make a new Desktop app client (SKILL.md 3b.3 and 3b.4) and sign in with its file.")
+    if (!body.refresh_token) throw new Error(`Google refused the sign-in: ${[body.error, body.error_description].filter(Boolean).join(": ") || `HTTP ${tok.status}, no refresh token`}`)
     if (!body.scope?.includes("webmasters")) throw new Error("Search Console access wasn't granted. Run this again and tick the Search Console box on Google's screen.")
     saveToken({ ...client, refresh_token: body.refresh_token })
     res.end("Signed in. You can close this tab.")
     console.log(`Signed in. Saved to ${tokenPath}`)
+    // Analytics is optional, but half of it is confusing: reading works and the approved changes fail later.
+    const granted = new Set(body.scope.split(" ").map((s) => s.replace("https://www.googleapis.com/auth/", "")))
+    const ga = ["analytics.readonly", "analytics.edit"].filter((s) => !granted.has(s))
+    if (ga.length === 2) console.log("Google Analytics wasn't ticked, so only Search Console will work. To add it, run this again and tick every box.")
+    else if (ga.length) console.log(`One Google Analytics box wasn't ticked (${ga[0]}), so ${ga[0] === "analytics.edit" ? "marking key events" : "reading Analytics"} won't work. To fix it, run this again and tick every box.`)
+    if (!granted.has("webmasters")) console.log("Search Console was granted read-only, so resubmitting sitemaps won't work. To fix it, run this again and tick every box.")
     process.exit(0)
   } catch (e) {
     res.end("Sign-in failed. Check the terminal.")
@@ -55,11 +63,11 @@ server.listen(0, "127.0.0.1", () => {
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth")
   url.search = new URLSearchParams({
     client_id: client.client_id, redirect_uri: redirect, response_type: "code",
-    scope: "https://www.googleapis.com/auth/webmasters.readonly",
+    scope: ["webmasters", "analytics.readonly", "analytics.edit"].map((s) => `https://www.googleapis.com/auth/${s}`).join(" "),
     access_type: "offline", prompt: "consent select_account", state,
     code_challenge: createHash("sha256").update(verifier).digest("base64url"), code_challenge_method: "S256",
   }).toString()
-  console.log(`Sign in with the Google account that has the site in Search Console. A browser tab should open; if it doesn't, open this link in a browser on this computer:\n\n${url}\n\nWaiting up to 5 minutes...`)
+  console.log(`Sign in with the Google account that has the site in Search Console (and Google Analytics, if they use it). Tick every box Google shows. A browser tab should open; if it doesn't, open this link in a browser on this computer:\n\n${url}\n\nWaiting up to 5 minutes...`)
   const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "explorer" : "xdg-open"
   execFile(opener, [url.href], () => {})
 })

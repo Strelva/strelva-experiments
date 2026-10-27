@@ -1,4 +1,0 @@
-interface:
-  display_name: "Check Google Search"
-  short_description: "Turn Search Console data into a ranked list of site fixes"
-  default_prompt: "Use $check-google-search to check how my site is doing in Google search and what to fix first."

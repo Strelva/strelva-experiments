@@ -19,7 +19,7 @@ export type PageHead = {
   h1: string | null
 }
 
-const UA = "Mozilla/5.0 (compatible; StrelvaCheckGoogleSearch/0.1; +https://github.com/Strelva/strelva-experiments)"
+const UA = "Mozilla/5.0 (compatible; StrelvaAgenticOptimization/0.2; +https://github.com/Strelva/strelva-experiments)"
 
 const decode = (s: string) =>
   s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim()

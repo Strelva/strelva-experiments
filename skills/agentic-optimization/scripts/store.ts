@@ -1,9 +1,10 @@
-/** Where the sign-in lives: ~/.config/check-google-search, or $CHECK_GOOGLE_SEARCH_DIR. done.json (finished fixes) sits next to it. */
+/** Where the sign-in lives: ~/.config/agentic-optimization, or $AGENTIC_OPTIMIZATION_DIR. done.json (finished fixes) and log/ (scheduled runs) sit next to it. */
 import { chmodSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 
-export const dir = process.env.CHECK_GOOGLE_SEARCH_DIR ?? join(homedir(), ".config", "check-google-search")
+export const dir = process.env.AGENTIC_OPTIMIZATION_DIR ?? join(homedir(), ".config", "agentic-optimization")
+export const logDir = join(dir, "log")
 export const tokenPath = join(dir, "token.json")
 
 export type Saved = { client_id: string; client_secret: string; refresh_token: string }

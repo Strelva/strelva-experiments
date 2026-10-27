@@ -41,13 +41,14 @@ The [`packs`](./packs/) shelf contains small, versioned source catalogs and
 human-executable methods for Buffalo property research, public evidence, and
 notice-to-resolution casework. Packs do not require the app or an API key.
 
-## Check Google Search
+## Agentic Optimization
 
-[`skills/check-google-search`](./skills/check-google-search/) is an agent skill
-for any website owner. It reads the site's last 28 days of Google Search Console
-data, read-only, and returns a ranked list of fixes with the numbers behind each,
-then checks about two weeks later whether a fix worked. It runs on the owner's computer
-with their own Google sign-in. See its [README](./skills/check-google-search/README.md).
+[`skills/agentic-optimization`](./skills/agentic-optimization/) is an agent skill
+for any website owner. It reads the site's Google Search Console and Google
+Analytics data, ranks what to fix with the numbers behind each, makes the fixes
+with the owner's OK, measures funnels, checks the site daily and weekly, and
+proves later whether each fix worked. It runs on the owner's computer with their
+own Google sign-in. See its [README](./skills/agentic-optimization/README.md).
 
 ## Add or update a source
 

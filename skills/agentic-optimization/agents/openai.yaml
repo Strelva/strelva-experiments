@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agentic Optimization"
+  short_description: "Run your site's Google search and conversions: ranked fixes, made with your OK, checked daily"
+  default_prompt: "Use $agentic-optimization to check how my site is doing on Google and what to fix first."
