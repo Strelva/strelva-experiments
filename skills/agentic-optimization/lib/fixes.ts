@@ -214,7 +214,8 @@ export async function runReport(token: string, site: string): Promise<Report> {
       id: `almost:${pathOf(url)}`,
       kind: home && !/\bnear me\b/i.test(lead) ? "missing-page" : "almost",
       page: url,
-      headline: home ? `People search "${lead}" and Google sends them to your homepage, past page 1` : `Just off page 1 for "${lead}"`,
+      // Positions 9-10 are still page one, just at the bottom of it.
+      headline: home ? `People search "${lead}" and Google sends them to your homepage, past page 1` : top[0].position < 10.5 ? `At the bottom of page 1 for "${lead}"` : `Just off page 1 for "${lead}"`,
       evidence: top.map((q) => `"${q.keys[0]}": ${imp(q.impressions)}, position ${pos(q.position)}`),
       todo: home
         ? homeTodo(lead, head)
@@ -356,7 +357,7 @@ export async function runReport(token: string, site: string): Promise<Report> {
   } else if (notIndexed.length) {
     fixes.push({
       id: "not-indexed", kind: "not-indexed", page: null,
-      headline: `Google hasn't added ${notIndexed.length} of the ${checked.length} pages we checked`,
+      headline: `Google hasn't added ${notIndexed.length} of the ${checked.length} unseen sitemap pages we checked`,
       evidence: [
         `${fmt(unseen.length)} of the ${truncated ? "first " : ""}${fmt(listed.length)} pages in your sitemap got no impressions in 28 days. We checked ${checked.length} of them:`,
         ...notIndexed.map((c) => `${pathOf(c.url)}: ${c.coverage}`),

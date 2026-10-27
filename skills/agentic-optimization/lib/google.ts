@@ -1,25 +1,32 @@
-/** Read-only calls to Google Search Console. Every function takes a short-lived access token. */
+/** Calls to Google Search Console. Every function takes a short-lived access token. */
 
 export type Row = { keys: string[]; clicks: number; impressions: number; ctr: number; position: number }
 
 const GSC = "https://searchconsole.googleapis.com"
 
-async function call<T>(token: string, url: string, body?: object): Promise<T> {
+/** One Google API call. Shared with lib/analytics.ts. */
+export async function call<T>(token: string, url: string, body?: object, method = body ? "POST" : "GET"): Promise<T> {
   const res = await fetch(url, {
-    method: body ? "POST" : "GET",
+    method,
     headers: { authorization: `Bearer ${token}`, ...(body ? { "content-type": "application/json" } : {}) },
     body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(30_000),
     cache: "no-store",
   }).catch((e: Error) => { throw new Error(`Couldn't reach Google (${e.message}). Check the internet connection and try again.`) })
+  const api = new URL(url).hostname.startsWith("analytics") ? "Google Analytics" : "Search Console"
+  const read = () => res.text().catch((e: Error) => { throw new Error(`Couldn't reach Google (${e.message}). Check the internet connection and try again.`) })
   if (!res.ok) {
     // Google puts the useful part (like "enable the API at <link>") in error.message.
-    const text = await res.text()
+    const text = await read()
     let message = text.slice(0, 500)
     try { message = (JSON.parse(text) as { error?: { message?: string } }).error?.message ?? message } catch {}
-    throw new Error(`Search Console: HTTP ${res.status}: ${message}`)
+    if (res.status === 403 && /insufficient authentication scopes|ACCESS_TOKEN_SCOPE_INSUFFICIENT/i.test(text)) {
+      throw new SignInNeeded(`The saved sign-in doesn't include ${api} access for this.`)
+    }
+    throw new Error(`${api}: HTTP ${res.status}: ${message}`)
   }
-  return (await res.json()) as T
+  const text = await read()
+  return (text ? JSON.parse(text) : {}) as T
 }
 
 /** Thrown when the saved sign-in no longer works and the owner has to sign in again. */
@@ -62,18 +69,42 @@ export async function searchRows(token: string, site: string, start: string, end
   return out
 }
 
-/** Daily clicks and impressions for one page, for the before/after view. */
+/**
+ * Daily clicks and impressions for one page, for the before/after view. The report merges http/https and
+ * www/no-www into one address, so this counts all of them too, with or without a trailing slash and with
+ * non-English characters written either way (/café or /caf%C3%A9).
+ */
 export async function pageDaily(token: string, site: string, page: string, start: string, end: string): Promise<Row[]> {
+  const u = new URL(page)
+  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const bare = u.pathname.replace(/\/+$/, "")
+  let decoded = bare
+  try { decoded = decodeURIComponent(bare) } catch {}
+  const paths = [...new Set([bare, decoded])].map(esc).join("|")
+  const expression = `^https?://(www\\.)?${esc(u.hostname.replace(/^www\./, ""))}(${paths})/?${esc(u.search)}$`
   const r = await call<{ rows?: Row[] }>(token, `${GSC}/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`, {
     startDate: start, endDate: end, dimensions: ["date"], rowLimit: 1000,
-    dimensionFilterGroups: [{ filters: [{ dimension: "page", operator: "equals", expression: page }] }],
+    dimensionFilterGroups: [{ filters: [{ dimension: "page", operator: "includingRegex", expression }] }],
   })
   return r.rows ?? []
 }
 
+export type Sitemap = { path: string; lastSubmitted?: string; lastDownloaded?: string; isPending?: boolean; errors?: string; warnings?: string; contents?: { type: string; submitted?: string }[] }
+
+/** The sitemaps Search Console has for the site, with when Google last read each and any errors. */
+export async function sitemapDetails(token: string, site: string): Promise<Sitemap[]> {
+  const r = await call<{ sitemap?: Sitemap[] }>(token, `${GSC}/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps`)
+  // Google no longer fills in contents[].indexed (it reads 0), so it's left out rather than misread.
+  return (r.sitemap ?? []).map((s) => ({ ...s, contents: s.contents?.map((c) => ({ type: c.type, submitted: c.submitted })) }))
+}
+
 export async function listSitemaps(token: string, site: string): Promise<string[]> {
-  const r = await call<{ sitemap?: { path: string }[] }>(token, `${GSC}/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps`)
-  return (r.sitemap ?? []).map((s) => s.path)
+  return (await sitemapDetails(token, site)).map((s) => s.path)
+}
+
+/** Submits (or resubmits) a sitemap, which asks Google to read it again. This is a change to Search Console. */
+export async function submitSitemap(token: string, site: string, sitemap: string): Promise<void> {
+  await call(token, `${GSC}/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps/${encodeURIComponent(sitemap)}`, undefined, "PUT")
 }
 
 export type Inspection = { url: string; verdict: string; coverage: string; lastCrawl?: string }
